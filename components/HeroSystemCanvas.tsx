@@ -1,123 +1,77 @@
 "use client";
 
-import { useRef, useMemo, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Points, PointMaterial } from "@react-three/drei";
-import * as THREE from "three";
 import { motion } from "framer-motion";
-
-function NodeNetwork() {
-  const ref = useRef<THREE.Points>(null);
-  const [mousePosition, setMousePosition] = useState(new THREE.Vector2());
-
-  // Generate random points in a sphere
-  const sphere = useMemo(() => {
-    const count = 2000;
-    const positions = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      const r = 5 * Math.cbrt(Math.random());
-      const theta = Math.random() * 2 * Math.PI;
-      const phi = Math.acos(2 * Math.random() - 1);
-      positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-      positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-      positions[i * 3 + 2] = r * Math.cos(phi);
-    }
-    return positions;
-  }, []);
-
-  useFrame((state, delta) => {
-    if (ref.current) {
-      ref.current.rotation.y -= delta / 10;
-      ref.current.rotation.x -= delta / 15;
-      
-      // Basic mouse reaction
-      setMousePosition(
-        new THREE.Vector2(
-          (state.pointer.x * state.viewport.width) / 2,
-          (state.pointer.y * state.viewport.height) / 2
-        )
-      );
-      ref.current.position.x = THREE.MathUtils.lerp(ref.current.position.x, state.pointer.x * 0.5, 0.05);
-      ref.current.position.y = THREE.MathUtils.lerp(ref.current.position.y, state.pointer.y * 0.5, 0.05);
-    }
-  });
-
-  return (
-    <group rotation={[0, 0, Math.PI / 4]}>
-      <Points ref={ref} positions={sphere} stride={3} frustumCulled={false}>
-        <PointMaterial
-          transparent
-          color="#00f0ff"
-          size={0.02}
-          sizeAttenuation={true}
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-        />
-      </Points>
-    </group>
-  );
-}
 
 export default function HeroSystemCanvas() {
   return (
-    <div className="relative w-full h-screen bg-black overflow-hidden flex flex-col items-center justify-center">
-      <div className="absolute inset-0 z-0 opacity-60">
-        <Canvas camera={{ position: [0, 0, 8] }}>
-          <NodeNetwork />
-        </Canvas>
-      </div>
-
-      <div className="relative z-10 text-center px-4 max-w-4xl mx-auto pointer-events-none flex flex-col items-center">
+    <div className="relative w-full h-screen bg-transparent overflow-hidden flex flex-col items-center justify-center">
+      
+      <div className="relative z-10 text-center px-4 max-w-[95vw] mx-auto pointer-events-none flex flex-col items-center justify-center h-full pt-10">
         
-        {/* Massive Company Name & Full Form */}
+        {/* Layer 3 - Primary Navigation / CTA (Now on top, without button) */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.8, filter: "blur(10px)" }}
-          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-          transition={{ duration: 1.2, ease: "easeOut" }}
-          className="mb-12 flex flex-col items-center w-full"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="flex flex-col items-center gap-4 w-full pointer-events-auto mb-16"
         >
-          <div className="text-7xl md:text-8xl lg:text-9xl font-black tracking-widest text-transparent bg-clip-text bg-linear-to-r from-neon-blue via-white to-neon-green drop-shadow-[0_0_30px_rgba(0,240,255,0.4)] mb-6 select-none">
-            ENGN<span className="text-gray-600">-</span>F1
-          </div>
-          <div className="px-5 py-2 rounded-full border border-gray-800 bg-black/60 backdrop-blur-md inline-flex items-center gap-3">
-            <span className="w-2 h-2 rounded-full bg-[#ff3333] animate-pulse shadow-[0_0_8px_#ff3333]"></span>
-            <span className="text-xs md:text-sm font-mono tracking-[0.3em] text-gray-300 uppercase font-semibold">
-              Engn-F1 Private Limited
-            </span>
-            <span className="w-2 h-2 rounded-full bg-[#ff3333] animate-pulse shadow-[0_0_8px_#ff3333]"></span>
+          <div className="relative inline-block px-4">
+            <p className="text-xs md:text-sm text-transparent bg-clip-text bg-linear-to-r from-cyan-400 via-white to-neon-green max-w-5xl tracking-[0.2em] md:tracking-[0.3em] uppercase font-bold text-center">
+              From real-time detection to localized execution, enabling layered autonomy that responds, intervenes, and acts across different operational environments
+            </p>
+            <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-32 h-[2px] bg-linear-to-r from-transparent via-cyan-400 to-transparent opacity-80 blur-[1px]"></div>
           </div>
         </motion.div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
+        {/* Massive Company Name */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8, filter: "blur(10px)" }}
+          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+          transition={{ duration: 1.2, delay: 0.4, ease: "easeOut" }}
+          className="mb-14 flex flex-col items-center w-full relative"
+        >
+          {/* Subtle background glow behind the text */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50%] h-[50%] bg-neon-blue/20 blur-[120px] rounded-full pointer-events-none"></div>
+
+          <div className="text-7xl md:text-9xl lg:text-[11rem] font-black tracking-widest text-transparent bg-clip-text bg-linear-to-b from-white via-gray-200 to-gray-600 drop-shadow-[0_0_60px_rgba(0,240,255,0.5)] mb-2 select-none leading-none">
+            ENGN<span className="text-neon-blue drop-shadow-[0_0_20px_rgba(0,240,255,1)]">-</span>F1
+          </div>
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.0, duration: 1 }}
+            className="text-xs md:text-sm lg:text-lg font-bold tracking-[0.2em] md:tracking-[0.4em] uppercase text-gray-200 mt-6 bg-black/50 px-8 py-3 rounded-full backdrop-blur-xl border border-neon-blue/40 shadow-[0_0_30px_rgba(0,240,255,0.2)] relative overflow-hidden group"
+          >
+            <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent w-full h-full transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+            Enforced Neural Generative Network <span className="text-neon-blue">at</span> Formula 1 Speed
+          </motion.div>
+        </motion.div>
+
+        {/* Layer 1 - Primary Identity Statement */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, ease: "easeOut", delay: 0.3 }}
-          className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white mb-6"
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="mb-8 w-full max-w-[90vw]"
         >
-          Engineering Intelligent Systems for{" "}
-          <span className="text-neon-blue animate-pulse">Real-World Execution</span>
-        </motion.h1>
-        
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1.2, delay: 0.5, ease: "easeOut" }}
-          className="text-lg md:text-xl text-gray-400"
+          <h1 className="text-2xl md:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight drop-shadow-lg">
+            An Experience-driven <span className="text-transparent bg-clip-text bg-linear-to-r from-neon-blue to-cyan-300">Computing Paradigm</span><br className="hidden md:block" /> Powered by Real-Time Operational Information.
+          </h1>
+        </motion.div>
+
+        {/* Layer 2 - Supporting Explanation */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.8 }}
+          className="max-w-[80vw] mx-auto"
         >
-          ENGNF1 is India&apos;s first optimization engine powered by AI + Quantum algorithms.
-        </motion.p>
+          <p className="text-sm md:text-base lg:text-xl text-gray-300 font-light leading-relaxed text-center italic">
+            A continuously observing intelligence flow that identifies disruptions as they emerge and responds through distributed operational nodes.
+          </p>
+        </motion.div>
+
       </div>
-      
-      {/* Scroll Indicator */}
-      <motion.div 
-        className="absolute bottom-10 z-10 flex flex-col items-center justify-center opacity-70"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 1 }}
-      >
-        <span className="text-xs uppercase tracking-[0.3em] mb-3 text-neon-green">Advanced Autonomous Techniques</span>
-        <div className="w-px h-12 bg-linear-to-b from-neon-green to-transparent"></div>
-      </motion.div>
     </div>
   );
 }

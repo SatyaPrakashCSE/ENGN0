@@ -34,11 +34,15 @@ export default function Navbar() {
 
         {/* Navigation Links */}
         <div className="hidden lg:flex gap-6 xl:gap-8 text-xs font-mono tracking-widest uppercase">
-          {["failure", "applications", "architecture", "system", "methodology", "founders"].map((id) => (
+          {[
+            { id: "what-is-engnf1", label: "What is ENGN-F1" },
+            { id: "how-it-works", label: "How it Works" },
+            { id: "team", label: "Teams" }
+          ].map((item) => (
             <button 
-              key={id}
+              key={item.id}
               onClick={() => {
-                const element = document.getElementById(id);
+                const element = document.getElementById(item.id);
                 if (element) {
                   const top = element.getBoundingClientRect().top + window.scrollY - 80;
                   window.scrollTo({ top, behavior: "smooth" });
@@ -46,7 +50,7 @@ export default function Navbar() {
               }}
               className="text-gray-400 hover:text-white transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-px after:bg-neon-blue hover:after:w-full after:transition-all"
             >
-              {id === "failure" ? "Failure" : id === "applications" ? "Applications" : id === "architecture" ? "Architecture" : id === "system" ? "System" : id === "methodology" ? "Methodology" : "Founders"}
+              {item.label}
             </button>
           ))}
         </div>

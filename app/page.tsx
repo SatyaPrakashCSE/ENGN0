@@ -1,21 +1,17 @@
+import GlobalBackground from "@/components/GlobalBackground";
 import HeroSystemCanvas from "@/components/HeroSystemCanvas";
-import ProblemSimulation from "@/components/ProblemSimulation";
-import SolutionTransition from "@/components/SolutionTransition";
+import WhatIsEngnf1 from "@/components/WhatIsEngnf1";
 import ArchitectureGraph from "@/components/ArchitectureGraph";
-import ApplicationsSection from "@/components/ApplicationsSection";
-import ResearchSection from "@/components/ResearchSection";
 import TeamSection from "@/components/TeamSection";
 import ContactSection from "@/components/ContactSection";
 
 export default function Home() {
   return (
-    <main className="w-full bg-black min-h-screen">
+    <main className="w-full bg-transparent min-h-screen text-gray-200 relative">
+      <GlobalBackground />
       <HeroSystemCanvas />
-      <ProblemSimulation />
-      <ApplicationsSection />
-      <SolutionTransition />
+      <WhatIsEngnf1 />
       <ArchitectureGraph />
-      <ResearchSection />
       <TeamSection />
       <ContactSection />
     </main>
