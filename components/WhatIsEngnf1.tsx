@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from "framer-motion";
 
 const components = [
   {
@@ -57,29 +57,108 @@ const NeuralNode = ({ isHovered, size = "large" }: { isHovered: boolean, size?: 
   );
 };
 
-const NodeCard = ({ comp, onClick }: { comp: typeof components[0], onClick: () => void }) => {
+const NodeCard = ({ comp, onClick, index }: { comp: typeof components[0], onClick: () => void, index: number }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // Determine if this card should span 2 columns
+  const isWide = index === 0 || index === 3;
+
+  // 3D Tilt state
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const mouseXSpring = useSpring(x, { stiffness: 150, damping: 20 });
+  const mouseYSpring = useSpring(y, { stiffness: 150, damping: 20 });
+
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    
+    // Normalize mouse position between -0.5 and 0.5
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    x.set(mouseX / width - 0.5);
+    y.set(mouseY / height - 0.5);
+
+    // Keep the spotlight logic
+    cardRef.current.style.setProperty("--mouse-x", `${mouseX}px`);
+    cardRef.current.style.setProperty("--mouse-y", `${mouseY}px`);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    x.set(0);
+    y.set(0);
+  };
+
   return (
     <motion.div
-      className="relative group bg-gray-950/40 backdrop-blur-xl border border-white/10 p-8 md:p-12 rounded-[2.5rem] flex flex-col items-center text-center cursor-pointer overflow-hidden transition-all duration-500 hover:border-cyan-400/40 hover:shadow-[0_0_50px_rgba(0,240,255,0.1)]"
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      style={{
+        rotateX,
+        rotateY,
+        transformStyle: "preserve-3d",
+      }}
+      className={`relative group bg-gray-950/60 backdrop-blur-2xl border-2 border-white/5 p-8 md:p-12 rounded-[2.5rem] flex ${isWide ? 'flex-col md:flex-row text-center md:text-left items-center' : 'flex-col items-center text-center'} cursor-pointer overflow-visible transition-shadow duration-500 hover:border-white/20 hover:shadow-[0_30px_60px_rgba(0,0,0,0.8),0_0_40px_rgba(0,240,255,0.1),inset_0_0_20px_rgba(255,255,255,0.05)] ${isWide ? 'md:col-span-2' : 'col-span-1'}`}
       onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      whileHover={{ y: -5 }}
+      onMouseLeave={handleMouseLeave}
+      whileHover={{ z: 30 }}
       whileTap={{ scale: 0.98 }}
     >
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-linear-to-r from-transparent via-cyan-400/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-      <div className="absolute inset-0 bg-linear-to-b from-cyan-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+      {/* 3D Hardware Edge (Simulated Depth) */}
+      <div 
+        className="absolute inset-0 rounded-[2.5rem] bg-linear-to-b from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" 
+        style={{ transform: "translateZ(-15px)", filter: "blur(2px)" }}
+      ></div>
 
-      <NeuralNode isHovered={isHovered} size="large" />
-
-      <h3 className="text-xl md:text-2xl font-bold text-gray-300 group-hover:text-white transition-colors leading-tight mb-4 z-10">
-        {comp.title}
-      </h3>
+      {/* Inner Spotlight effect */}
+      <div 
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-[2.5rem]"
+        style={{
+          background: "radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(0, 240, 255, 0.08), transparent 40%)"
+        }}
+      />
       
-      <p className="text-xs md:text-sm tracking-widest uppercase text-gray-600 group-hover:text-neon-blue transition-colors z-10 font-semibold">
-        Explore Node
-      </p>
+      {/* Border Spotlight effect */}
+      <div 
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-[2.5rem] border border-cyan-400/50"
+        style={{
+          maskImage: "radial-gradient(400px circle at var(--mouse-x) var(--mouse-y), black, transparent 50%)",
+          WebkitMaskImage: "radial-gradient(400px circle at var(--mouse-x) var(--mouse-y), black, transparent 50%)",
+          transform: "translateZ(1px)"
+        }}
+      />
+
+      <div className={`relative z-10 ${isWide ? 'md:pr-12 md:mr-12 md:border-r md:border-white/10 mb-8 md:mb-0' : 'mb-8'}`} style={{ transform: "translateZ(40px)" }}>
+        <NeuralNode isHovered={isHovered} size={isWide ? "large" : "small"} />
+      </div>
+
+      <div className="relative z-10 flex-1 flex flex-col justify-center w-full" style={{ transform: "translateZ(30px)" }}>
+        <h3 className={`font-bold text-gray-300 group-hover:text-white transition-colors leading-tight mb-4 ${isWide ? 'text-2xl md:text-4xl' : 'text-xl md:text-2xl'}`}>
+          {comp.title}
+        </h3>
+        
+        {/* The short description is shown dynamically on wide cards or on hover for small cards */}
+        <p className={`text-gray-500 text-sm md:text-base leading-relaxed mb-6 font-light transition-all duration-300 ${isWide ? 'opacity-100' : 'opacity-0 h-0 group-hover:opacity-100 group-hover:h-auto'}`}>
+          {comp.description}
+        </p>
+        
+        <div className={`flex items-center gap-2 group-hover:text-neon-blue text-gray-600 transition-colors ${isWide ? 'justify-center md:justify-start' : 'justify-center'}`}>
+          <p className="text-xs md:text-sm tracking-widest uppercase font-semibold">
+            Explore Node
+          </p>
+          <svg className="w-4 h-4 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+        </div>
+      </div>
     </motion.div>
   );
 };
@@ -101,8 +180,11 @@ export default function WhatIsEngnf1() {
   return (
     <section id="what-is-engnf1" className="min-h-screen bg-transparent py-32 px-4 md:px-12 relative overflow-hidden flex flex-col justify-center">
       {/* Ambient background glows */}
-      <div className="absolute top-0 left-0 w-50 h-50 bg-neon-blue/5 blur-[150px] rounded-full pointer-events-none -translate-x-1/2 -translate-y-1/2"></div>
-      <div className="absolute bottom-0 right-0 w-50 h-50 bg-cyan-400/5 blur-[150px] rounded-full pointer-events-none translate-x-1/2 translate-y-1/2"></div>
+      <div className="absolute top-0 left-0 w-96 h-96 bg-neon-blue/5 blur-[150px] rounded-full pointer-events-none -translate-x-1/2 -translate-y-1/2"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-cyan-400/5 blur-[150px] rounded-full pointer-events-none translate-x-1/2 translate-y-1/2"></div>
+      
+      {/* Animated Grid Background */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px] mask-[radial-gradient(ellipse_60%_80%_at_50%_50%,#000_60%,transparent_100%)] pointer-events-none z-0"></div>
 
       <div className="max-w-7xl mx-auto w-full relative z-10 flex flex-col items-center">
         
@@ -116,10 +198,10 @@ export default function WhatIsEngnf1() {
           WHAT IS ENGN-F1
         </motion.h2>
 
-        {/* Symmetrical 2x2 Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 w-full max-w-5xl">
-          {components.map((comp) => (
-            <NodeCard key={comp.id} comp={comp} onClick={() => setActiveCard(comp.id)} />
+        {/* Bento Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-6xl relative z-10" style={{ perspective: 1200 }}>
+          {components.map((comp, index) => (
+            <NodeCard key={comp.id} comp={comp} index={index} onClick={() => setActiveCard(comp.id)} />
           ))}
         </div>
 
@@ -135,12 +217,13 @@ export default function WhatIsEngnf1() {
               <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setActiveCard(null)}></div>
               
               <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 30 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 30 }}
-                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                initial={{ opacity: 0, scale: 0.9, rotateX: 20 }}
+                animate={{ opacity: 1, scale: 1, rotateX: 0 }}
+                exit={{ opacity: 0, scale: 0.95, rotateX: -20 }}
+                transition={{ type: "spring", damping: 30, stiffness: 200 }}
+                style={{ transformPerspective: 1000 }}
                 data-lenis-prevent
-                className="relative w-full max-w-4xl max-h-[85vh] overflow-y-auto bg-gray-950/80 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-8 md:p-14 shadow-[0_0_100px_rgba(0,240,255,0.15)] scrollbar-hide"
+                className="relative w-full max-w-4xl max-h-[85vh] overflow-y-auto bg-gray-950/90 backdrop-blur-2xl border border-white/10 border-t-cyan-400/50 rounded-[2.5rem] p-8 md:p-14 shadow-[0_20px_100px_rgba(0,240,255,0.15)] scrollbar-hide"
               >
                 {/* Decorative background glow inside modal */}
                 <div className="absolute -top-40 -right-40 w-80 h-80 bg-neon-blue/20 blur-[100px] rounded-full pointer-events-none"></div>
@@ -199,7 +282,7 @@ export default function WhatIsEngnf1() {
             <div className="absolute inset-0 bg-linear-to-r from-neon-blue/20 via-cyan-400/20 to-neon-blue/20 blur-2xl rounded-full opacity-40 group-hover:opacity-80 transition-opacity duration-700 pointer-events-none"></div>
             <div className="relative px-8 py-6 border border-white/10 bg-black/60 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl flex flex-col md:flex-row items-center justify-center gap-4 text-center md:text-left">
               <span className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-linear-to-r from-neon-blue to-cyan-300 tracking-wider">
-                ENGN-F1.
+                ENGN-F1
               </span>
               <span className="text-gray-400 text-sm md:text-lg italic font-light">
                 “Transforming operational experience into continuously evolving intelligence.”

@@ -9,6 +9,7 @@ const teamMembers = [
     phone: "+91 7278183606",
     emails: ["arnbrxdas@gmail.com", "arnab@engnf1.com"],
     connectEmail: "arnbrxdas@gmail.com",
+    linkedin: "https://www.linkedin.com/in/arnab-das-7748b6205/",
   },
   {
     name: "Sarthak Chakraborty",
@@ -16,6 +17,7 @@ const teamMembers = [
     phone: "+91 8585835583",
     emails: ["sarthak.chakraborty.144@gmail.com", "sarthak@engnf1.com"],
     connectEmail: "sarthak.chakraborty.144@gmail.com",
+    linkedin: "https://www.linkedin.com/in/sarthakchakraborty/",
   }
 ];
 
@@ -59,12 +61,27 @@ export default function TeamSection() {
                 ))}
               </div>
 
-              <button 
-                onClick={() => window.location.href = `mailto:${member.connectEmail}`}
-                className="w-full text-center py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors font-medium"
-              >
-                Contact
-              </button>
+              <div className="flex gap-4">
+                <button 
+                  onClick={() => window.location.href = `mailto:${member.connectEmail}`}
+                  className="flex-1 text-center py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors font-medium"
+                >
+                  Contact
+                </button>
+                <a 
+                  href={member.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center p-3 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors"
+                  aria-label={`${member.name}'s LinkedIn`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                    <rect x="2" y="9" width="4" height="12" />
+                    <circle cx="4" cy="4" r="2" />
+                  </svg>
+                </a>
+              </div>
             </motion.div>
           ))}
         </div>

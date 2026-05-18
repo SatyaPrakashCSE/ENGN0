@@ -162,6 +162,18 @@ export default function ContactSection() {
               <span className="block text-sm text-gray-500 mb-1">Location</span>
               <span className="text-gray-300">India</span>
             </div>
+            <div className="hidden md:block w-px h-8 bg-gray-800"></div>
+            <div>
+              <span className="block text-sm text-gray-500 mb-1">Follow Us</span>
+              <a href="https://www.linkedin.com/company/engn-f1/posts/?feedView=all" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center text-gray-300 hover:text-gray-200 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                  <rect x="2" y="9" width="4" height="12" />
+                  <circle cx="4" cy="4" r="2" />
+                </svg>
+                LinkedIn
+              </a>
+            </div>
           </motion.div>
 
         </div>

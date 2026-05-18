@@ -2,6 +2,7 @@ import GlobalBackground from "@/components/GlobalBackground";
 import HeroSystemCanvas from "@/components/HeroSystemCanvas";
 import WhatIsEngnf1 from "@/components/WhatIsEngnf1";
 import ArchitectureGraph from "@/components/ArchitectureGraph";
+import PillarsSection from "@/components/PillarsSection";
 import TeamSection from "@/components/TeamSection";
 import ContactSection from "@/components/ContactSection";
 
@@ -11,6 +12,7 @@ export default function Home() {
       <GlobalBackground />
       <HeroSystemCanvas />
       <WhatIsEngnf1 />
+      <PillarsSection />
       <ArchitectureGraph />
       <TeamSection />
       <ContactSection />

@@ -36,6 +36,7 @@ export default function Navbar() {
         <div className="hidden lg:flex gap-6 xl:gap-8 text-xs font-mono tracking-widest uppercase">
           {[
             { id: "what-is-engnf1", label: "What is ENGN-F1" },
+            { id: "pillars", label: "Pillars" },
             { id: "how-it-works", label: "How it Works" },
             { id: "team", label: "Teams" }
           ].map((item) => (
